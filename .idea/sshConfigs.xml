@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="59.172.63.2" id="3fda18c4-a11b-476f-be35-126ad2b81b30" port="22122" customName="sshConfig://fzq@59.172.63.2:22122 password/data1/home/fzq/miniconda3/envs/mmf3/bin/python3.7" nameFormat="CUSTOM" username="fzq" />
+    </configs>
+  </component>
+</project>

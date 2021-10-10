@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/pic_analsys" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="Remote Python 3.7.10 (sftp://fzq@59.172.63.2:22122/data1/home/fzq/miniconda3/envs/mmf3/bin/python3.7)" jdkType="Python SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

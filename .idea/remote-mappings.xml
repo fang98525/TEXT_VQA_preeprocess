@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="python@380e0129-36b9-4d3d-a51d-2e2942558cee" />
+        <remote-mappings server-id="python@sshConfig://fzq@59.172.63.2:22122 password/data1/home/fzq/miniconda3/envs/mmf3/bin/python3.7">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$" remote-root="/data1/home/fzq/projects/TextVQA" />
+            </list>
+          </settings>
+        </remote-mappings>
+      </list>
+    </list>
+  </component>
+</project>

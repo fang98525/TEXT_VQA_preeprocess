@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="380e0129-36b9-4d3d-a51d-2e2942558cee" name="sshConfig://fzq@59.172.63.2:22122 password/data1/home/fzq/miniconda3/envs/mmf3/bin/python3.7">
+        <fileTransfer accessType="SFTP" host="59.172.63.2" port="22122" sshConfigId="3fda18c4-a11b-476f-be35-126ad2b81b30" sshConfig="sshConfig://fzq@59.172.63.2:22122 password/data1/home/fzq/miniconda3/envs/mmf3/bin/python3.7" />
+      </webServer>
+    </option>
+  </component>
+</project>
