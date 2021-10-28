@@ -6,12 +6,12 @@ from PIL import Image
 import numpy as np
 import os, glob
 
-data_dir = 'D:\\新建文件夹\\数据集处理\\examples_pic'  # train
+data_dir = 'D:\\新建文件夹\\数据集处理\\examples_pic'  # ocr_lmdb_file
 features_dir = 'D:\\新建文件夹\\数据集处理\\feature'  # Vgg_features_train
 
 
 """"
-提取dir下所有图片的feature       目前使用这个，后面在测试效果
+提取dir下所有图片的feature       目前使用这个，后面在测试效果   使用cpu  gou 用不了
 
 """
 
@@ -35,9 +35,38 @@ class Encoder(nn.Module):
         output=self.linear(output)  # 修改输出为2048维
         return output
 
-
+torch.cuda.empty_cache()
 model = Encoder()
-model = model.cuda()
+# model = model.cuda()
+
+#直接提取区域
+def extractor_imgcode(img_code,net,  use_gpu=False):
+
+
+    transform = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor()]
+    )
+
+
+    img = transform(img_code)
+    print("box的尺寸为：",img.shape)
+
+    x = Variable(torch.unsqueeze(img, dim=0).float(), requires_grad=False)
+    # print(x.shape)
+
+    if use_gpu:
+        x = x.cuda()
+        net = net.cuda()
+    y = net(x).cpu()
+    y = torch.squeeze(y)
+    y = y.data.numpy()
+    # print("输出特征size：",y.shape)
+    # print("当前box的feature：",y)
+    # np.savetxt(saved_path, y, delimiter=',')
+    return y
+
 
 
 def extractor(img_path, saved_path, net, use_gpu):
@@ -49,7 +78,7 @@ def extractor(img_path, saved_path, net, use_gpu):
 
     img = Image.open(img_path)
     img = transform(img)
-    print("图片的尺寸为：",img.shape)
+    # print("图片的尺寸为：",img.shape)
 
     x = Variable(torch.unsqueeze(img, dim=0).float(), requires_grad=False)
     # print(x.shape)
@@ -61,7 +90,8 @@ def extractor(img_path, saved_path, net, use_gpu):
     y = torch.squeeze(y)
     y = y.data.numpy()
     print("输出特征size：",y.shape)
-    print(y)
+    print(y[:100])
+
     # np.savetxt(saved_path, y, delimiter=',')
 
 
@@ -78,6 +108,7 @@ if __name__ == '__main__':
     print(files_list)
 
     use_gpu = torch.cuda.is_available()
+    use_gpu=False
 
     for x_path in files_list:
         print("图片" + x_path)

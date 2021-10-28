@@ -4,10 +4,11 @@ import lmdb
 import pickle
 import  json
 import cv2
+import tqdm
 from PIL import Image
 import os
 import shutil #复制文件用
-
+import re
 
 def  annoation_analys():
     """对训练集进行分析"""
@@ -51,7 +52,7 @@ def get_Allpics_size(dir_pah):
             path=dir_pah+item
             imag = Image.open(path)
             print("图片{}的尺寸为".format(item), imag.size)
-# get_Allpics_size("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\images\\train\\")
+# get_Allpics_size("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\images\\ocr_lmdb_file\\")
 
 
 
@@ -77,7 +78,7 @@ def get_answer_list(train_json_dir):
                total_question+=1
             index+=1
     return  question_list ,answer_list
-# question_list ,answer_list=get_answer_list("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\annotations\\train.json")
+# question_list ,answer_list=get_answer_list("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\annotations\\ocr_lmdb_file.json")
 # print(question_list,answer_list)
 
 
@@ -128,10 +129,16 @@ def is_contains_chinese(strs):
             return True
     return False
 
+#只保留中文字符
+def remove(text):
+    remove_chars = r'[^\u4e00-\u9fa5]'
+    return re.sub(remove_chars, '', text)
+
+
 #获取中文问题图片的名称
 def get_chinese_pic_list_of_ques():
-    # with open("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\annotations\\train.json")  as f:
-    with open("/data1/home/fzq/projects/mmf/data/datsets/EST-VQA-v1.0/annotations/test.json")  as f:
+    # with open("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\annotations\\ocr_lmdb_file.json")  as f:
+    with open("./test_data/train.json")  as f:
         train=json.load(f,encoding="utf8")
 
         train = pandas.DataFrame(data=train)
@@ -139,9 +146,9 @@ def get_chinese_pic_list_of_ques():
         index, total_question = 0, 0
         pic_list=[]
         for i in train["annotation"] :
-            print("图片：", train["image"][index], "索引是：", index)
+            # print("图片：", train["image"][index], "索引是：", index)
             for annoation in i:
-               print("问题是：", annoation["question"], "答案是：", annoation["answer"], "第{}个问题".format(total_question))
+               # print("问题是：", annoation["question"], "答案是：", annoation["answer"], "第{}个问题".format(total_question))
                total_question+=1
                if  is_contains_chinese(annoation["question"]):
                    pic_list.append(train["image"][index])
@@ -171,9 +178,80 @@ def copy_pic_to_dir(pic_name):
             else:
                 os.makedirs(os.path.join(dest_dir))
                 shutil.copy(os.path.join(pic_dir, image), os.path.join(dest_dir))
-#将所有中文问题的图片返稿一个文件夹
-pic_list=get_chinese_pic_list_of_ques()
-new_list=list(set(pic_list))
-new_list.sort(key=pic_list.index)
-for pic in pic_list:
-    copy_pic_to_dir(pic)
+#将所有中文问题的图片放到一个文件夹
+# pic_list=get_chinese_pic_list_of_ques()
+# new_list=list(set(pic_list))
+# new_list.sort(key=pic_list.index)
+# for pic in pic_list:
+#     copy_pic_to_dir(pic)
+
+
+
+#读取ocr的结果  将路径下的json文件进行合并
+def merge_json(path):
+    file_list = os.listdir(path)
+    print(file_list)
+    all_data=[]
+    with open(path+"\\train_ch_ocr.json","w",encoding="utf8") as f0:
+        for i in range(5):
+                with open(path+"\\中文训练集部分ocr结果{}.json".format(i),mode="r",encoding="utf8",) as f:
+                    # for line in tqdm.tqdm(f):
+                    line_dict=json.load(f)  #扩展列表用extend
+                    all_data.extend(line_dict)
+                    js = json.dumps(line_dict, ensure_ascii=False)
+                    f0.write(js + '\n')
+                    f.close()
+        f0.close()
+        print(all_data,len(all_data))
+# merge_json("D:\\Download\\sample_picture")
+
+
+
+
+#将train.json 和test.json进行分割   分割成中英文两部分
+def  spilt_annoation_file(dir):
+    with open(dir)  as f:
+        train=json.load(f,encoding="utf8")
+        train = pandas.DataFrame(data=train)
+        pandas.set_option('display.max_columns', None)
+        index, total_question = 0, 0
+        text= []
+        for i in train["annotation"] :
+            for annoation in i:
+               # print("问题是：", annoation["question"], "答案是：", annoation["answer"], "第{}个问题".format(total_question))
+
+               if  is_contains_chinese(annoation["question"]):
+                   text.append(annoation["answer"])
+            index+=1
+        #text 为答案合集
+        print(text,len(text))
+# spilt_annoation_file("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\annotations\\train.json")
+
+
+
+#过滤json文件中  非中文问题的样本
+def get_all_ch_picName(dir):
+    with open(dir)  as f:
+        data = json.load(f, encoding="utf8")
+        ch_data=[]
+
+        for i in data:
+            for annoation in i["annotation"]:
+                # 若不是中文问题，则剔除  是就添加到list  break 只添加一次
+                if is_contains_chinese(annoation["question"]):
+                    ch_data.append(i)
+                    break
+                if  not  is_contains_chinese(annoation["question"]):
+                    del annoation
+                    continue
+        # 去重
+        # ch_data = list(set(ch_data))
+        print(ch_data,len(ch_data))
+        return ch_data
+data=get_all_ch_picName("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\annotations\\train.json")
+#保存
+# with open("test_data/EST_CH_train.json", mode="w", encoding="utf8") as f:
+#     json.dump(data,f,ensure_ascii=False)
+
+
+

@@ -14,6 +14,7 @@ from iopath.common.file_io import PathManager as pm
 PathManager = pm()
 
 """将lmdb里面存储的npy  以及npy  info  还原出来
+以及将提取npy————》lmdb
   """
 class LMDBConversion:
     def __init__(self):
@@ -45,11 +46,13 @@ class LMDBConversion:
     def convert(self):
         env = lmdb.open(self.args.lmdb_path, map_size=1099511627776)
         id_list = []
+        #所有的npy文件 的绝对路径
         all_features = glob.glob(
             os.path.join(self.args.features_folder, "**", "*.npy"), recursive=True
         )
-
+      #所有 feature npy文件的绝对路径
         features = []
+        #读取npy feature list     key就是path
         for feature in all_features:
             if not feature.endswith("_info.npy"):
                 features.append(feature)
@@ -58,13 +61,14 @@ class LMDBConversion:
             for infile in tqdm.tqdm(features):
                 reader = np.load(infile, allow_pickle=True)
                 item = {}
+                #或取文件的纯名称  0000005  也是lmdb的key
                 split = os.path.relpath(infile, self.args.features_folder).split(
                     ".npy"
                 )[0]
                 item["feature_path"] = split
                 key = split.encode()
                 id_list.append(key)
-                item["features"] = reader
+                item["features"] = reader #1
                 info_file = infile.split(".npy")[0] + "_info.npy"
                 if not os.path.isfile(info_file):
                     txn.put(key, pickle.dumps(item))
@@ -76,7 +80,7 @@ class LMDBConversion:
                 item["num_boxes"] = reader.item().get("num_boxes")
                 item["objects"] = reader.item().get("objects")
                 item["cls_prob"] = reader.item().get("cls_prob", None)
-                item["bbox"] = reader.item().get("bbox")
+                item["bbox"] = reader.item().get("bbox")#7
 
                 txn.put(key, pickle.dumps(item))
 
@@ -118,9 +122,9 @@ class LMDBConversion:
                 PathManager.mkdirs(base_path)
                 np.save(PathManager.open(path, "wb"), item["features"])
                 np.save(PathManager.open(info_path, "wb"), tmp_dict)
-                i+=1
-                if i==10:
-                    break
+                # i+=1
+                # if i==10:
+                #     break
 
     def execute(self):
         if self.args.mode == "convert":
