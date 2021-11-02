@@ -19,7 +19,7 @@ import numpy as np
 import cv2
 import sys
 sys.path.append("..")
-from pic_feature_extract.vgg_extract_feature  import extractor_imgcode,Encoder
+# from pic_feature_extract.vgg_extract_feature  import extractor_imgcode,Encoder
 
 from PIL import Image
 
@@ -34,7 +34,7 @@ APPID = "0c293935"
 # 接口密钥(webapi类型应用开通印刷文字识别服务后，控制台--我的应用---印刷文字识别---服务的apikey)
 API_KEY = "2994a6604d85311a34dcb8ce0d28ce41"
 
-net=Encoder()
+# net=Encoder()
 #调用请求头  修改调用参数
 def getHeader(if_need_location):
     #  当前时间戳
@@ -102,9 +102,9 @@ def  plot_box_in_picture(picpath,boxes):
         #1channel  to 3 channel   pil
         im1=im2=im3=region.convert("L")
         region=Image.merge("RGB",(im1,im2,im3))
-        feature=extractor_imgcode(region,net=net)
+        # feature=extractor_imgcode(region,net=net)
         # feature=[round(i, 8) for i in feature]
-        featurelist.append(feature)
+        # featurelist.append(feature)
 
 
   #是否显示识别结构图片
@@ -113,7 +113,7 @@ def  plot_box_in_picture(picpath,boxes):
     # plt.xticks([])
     # plt.yticks([])
     # plt.show()
-    return featurelist
+    # return featurelist
 
 
 def detet_a_pic_and_plot(pic_path):
@@ -132,6 +132,7 @@ def detet_a_pic_and_plot(pic_path):
 
     # 解析返回结果
     result_json = json.loads(result)
+    print(result_json)
 
 
     #识别的文字结果和对应的精准位置
@@ -153,7 +154,7 @@ if __name__ == '__main__':
 
 
     # 识别a example
-    pic_path="../test_data/020372.jpg"
+    pic_path="../test_data/003656.jpg"
     result,feature=detet_a_pic_and_plot(pic_path)
     print(result,feature)
 
@@ -181,8 +182,6 @@ if __name__ == '__main__':
             np.save("./MY_EST_CH_train_ocr_feature6.npy",feature_dictionary)
         else:
             np.save("./MY_EST_CH_train_ocr_feature6.npy",feature_dictionary)
-
-
         # except:
         #     env_db = lmdb.Environment('../test_data/MY_EST_CH_all_train_ocr_feature.lmdb')
         #     txn = env_db.begin(write=True)
@@ -205,7 +204,8 @@ if __name__ == '__main__':
         #         txn.put(key=key.encode(), value=pickle.dumps(value))
         #     txn.commit()  # 提交
         #     env_db.close()
-    fun()
+    # fun()
+
 
 
 

@@ -6,15 +6,15 @@ from PIL import Image
 import numpy as np
 import os, glob
 
-data_dir = './test'  # train
+data_dir = '../test_data'  # ocr_lmdb_file
 features_dir = './Resnet_features_test'  # Resnet_features_train
 
 #这里自己修改网络
 
 
-class net(nn.Module):
+class resnet(nn.Module):
     def __init__(self):
-        super(net, self).__init__()
+        super(resnet, self).__init__()
         self.net = models.resnet50(pretrained=True)
 
     def forward(self, input):
@@ -30,9 +30,9 @@ class net(nn.Module):
         return output
 
 
-model = net()
+model = resnet()
 # 加载cuda
-model = model.cuda()
+# model = model.cuda()
 
 
 def extractor(img_path, saved_path, net, use_gpu):
@@ -56,7 +56,7 @@ def extractor(img_path, saved_path, net, use_gpu):
     y = torch.squeeze(y)
     y = y.data.numpy()
     print(y.shape)
-    np.savetxt(saved_path, y, delimiter=',')
+    # np.savetxt(saved_path, y, delimiter=',')
 
 
 if __name__ == '__main__':

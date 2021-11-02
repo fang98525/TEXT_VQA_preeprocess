@@ -35,8 +35,8 @@ def   detect_one_picture(imagepath):
     image = cv2.resize(image, (newW, newH))
     (H, W) = image.shape[:2]
 
-    # define the two output layer names for the EAST detector model that
-    # we are interested -- the first is the output probabilities and the
+    # define the two LMDB_output layer names for the EAST detector model that
+    # we are interested -- the first is the LMDB_output probabilities and the
     # second can be used to derive the bounding box coordinates of text
     layerNames = [
         "feature_fusion/Conv_7/Sigmoid",
@@ -47,7 +47,7 @@ def   detect_one_picture(imagepath):
     net = cv2.dnn.readNet(modelpath)
 
     # construct a blob from the image and then perform a forward pass of
-    # the model to obtain the two output layer sets
+    # the model to obtain the two LMDB_output layer sets
     blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
                                  (123.68, 116.78, 103.94), swapRB=True, crop=False)
     start = time.time()
@@ -124,9 +124,9 @@ def   detect_one_picture(imagepath):
         # draw the bounding box on the image     根据box描点
         cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 0, 255), 2)
 
-    # show the output image
+    # show the LMDB_output image
     cv2.imshow("Text Detection", orig)
-    # cv2.imwrite("D:\\Download\\sample_picture\\output", orig)  #保存识别的图片   暂时不保存
+    # cv2.imwrite("D:\\Download\\sample_picture\\LMDB_output", orig)  #保存识别的图片   暂时不保存
     cv2.waitKey(0)
 
 def get_pict_pathlists(dir_path):

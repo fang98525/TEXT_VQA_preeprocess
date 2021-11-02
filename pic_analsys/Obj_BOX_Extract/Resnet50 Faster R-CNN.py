@@ -26,7 +26,7 @@ model.eval()
 #训练的类别名称
 COCO_INSTANCE_CATEGORY_NAMES = [
     '__background__', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
-    'train', 'truck', 'boat', 'traffic light', 'fire hydrant', 'N/A', 'stop sign',
+    'ocr_lmdb_file', 'truck', 'boat', 'traffic light', 'fire hydrant', 'N/A', 'stop sign',
     'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
     'elephant', 'bear', 'zebra', 'giraffe', 'N/A', 'backpack', 'umbrella', 'N/A', 'N/A',
     'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
@@ -98,7 +98,7 @@ def object_detection_api(img_path, threshold=0.5, rect_th=3, text_size=3, text_t
         cv2.putText(img, pred_cls[index], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, text_size, (0, 255, 0),
                     thickness=text_th)  # Write the prediction class
         index+=1
-    plt.figure(figsize=(5, 8))  # display the output image
+    plt.figure(figsize=(5, 8))  # display the LMDB_output image
     plt.imshow(img)
     plt.xticks([])
     plt.yticks([])

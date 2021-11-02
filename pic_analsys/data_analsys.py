@@ -248,10 +248,17 @@ def get_all_ch_picName(dir):
         # ch_data = list(set(ch_data))
         print(ch_data,len(ch_data))
         return ch_data
-data=get_all_ch_picName("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\annotations\\train.json")
+# data=get_all_ch_picName("D:\\新建文件夹\\数据集处理\\EST-VQA-v1.0\\annotations\\train.json")
 #保存
 # with open("test_data/EST_CH_train.json", mode="w", encoding="utf8") as f:
 #     json.dump(data,f,ensure_ascii=False)
 
+
+#加载textvqa  json result
+def read_experiment_result():
+    with  open("./test_data/experiment_result/textvqa_run_val_2021-11-02T06_40_47.json") as f:
+        data=json.load(f)
+        print(data)
+read_experiment_result()
 
 

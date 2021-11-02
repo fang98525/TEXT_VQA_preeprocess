@@ -87,7 +87,7 @@ with open("test_data/EST_CH_OCR_train.json", 'r', encoding="utf8") as f1 :
 
         for item in ocr_data:
             ocr_list.append(item)
-    print(ocr_list[:1],"\n",len(ocr_list))
+    print("EST_CH_OCR_train.json的信息：",ocr_list[:1],"\n",len(ocr_list))
 
 
 
@@ -102,7 +102,7 @@ def get_LMDB_data(name):
     env_db.close()
     return  LMDB_data
 
-# env_db = lmdb.Environment('./test_data/EST_train_obj_lmdb')
+# env_db = lmdb.Environment('./test_data/EST_train_obj_lmdb.lmdb')
 # txn = env_db.begin(write=True)
 # value=txn.get(str("000000").encode())   #vmb   一共22025个
 # print (pickle.loads(value))
@@ -116,7 +116,7 @@ with open ("./test_data/EST_CH_train.json","r",encoding="utf8") as f :
     data_EST=json.load(f)
     #在第一行插入创建信息
     curtime = datetime.datetime.now().strftime('%Y-%m-%d')
-    data_EST.insert(0,{'creation_time':curtime, 'version': 0.5, 'dataset_type': 'train', 'has_answer': True})
+    data_EST.insert(0,{'creation_time':curtime, 'version': 0.5, 'dataset_type': 'val', 'has_answer': True})
 
     #获取所有的名称lsit    image path 就是image name
     name_list=[]
@@ -137,7 +137,7 @@ with open ("./test_data/EST_CH_train.json","r",encoding="utf8") as f :
         i["answers"]=[i["annotation"]['answer']  for  _ in range(10)]   # 暂时没有对答案添加干扰
         i['question_tokens']=[token  for token in   i["annotation"]['question'].replace("?","")   ]             #去掉？进行中文分字
         i["question_id"]=i["annotation"]['question_id']
-        i["set_name"]="train"  #没有划分数据集  暂时都设为train
+        i["set_name"]="val"  #没有划分数据集  暂时都设为train
         i['image_name']= i['image_id']
         i['image_path']=i["image"]   #暂时取图片全名
         i['feature_path']=i['image_id']  #不需要npy
@@ -153,37 +153,42 @@ with open ("./test_data/EST_CH_train.json","r",encoding="utf8") as f :
                 starty = j["location"]['top_left']["y"]
                 endX=j["location"]['right_bottom']["x"]
                 endy= j["location"]['right_bottom']["y"]
-                box=[round(startX/width,8),round(starty/height,8),round(endX/width,8),round(endy/height,8)]
+                box=[round(startX/width,16),round(starty/height,16),round(endX/width,16),round(endy/height,16)]
                 ocr_box_list.append(box)
         # print(ocr_box_list)
         index+=1
+        if  not word_list:   #对ocr结果为空的进行处理
+            word_list.append("无")
+            # print(i["image"])
+            ocr_box_list.append([0.5]*4)
         i['ocr_tokens'] =word_list
         #加载ocrbox 信息
-        i["ocr_normalized_boxes"]=ocr_box_list
+        i["ocr_normalized_boxes"]=np.array(ocr_box_list,dtype=np.float32)
         lmdb_data=get_LMDB_data(i["image_name"])
         L_w,L_h=lmdb_data["image_width"],lmdb_data["image_height"]
         L_box=[]
         for item in lmdb_data["bbox"]:
                 box_L = [round(item[0] / L_w, 8), round(item[1] / L_h, 8), round(item[2]/ L_w, 8),round(item[3]/ L_h, 8)]
                 L_box.append(box_L)
-        i['obj_normalized_boxes']=L_box
+        i['obj_normalized_boxes']=np.array(L_box,dtype=np.float32)
         del i["annotation"]
 
     #前8000个为训练集  保存为json文件
-    with open('./test_data/EST_npy/MY_EST_train.json', "w", encoding="utf8") as f:
-        json.dump(data_EST[:8001],f,ensure_ascii=False)
-    with open('./test_data/EST_npy/MY_EST_val.json', "w", encoding="utf8") as f:
-        json.dump(data_EST[8001:],f,ensure_ascii=False)
+    # with open('./test_data/EST_npy/MY_EST_train.json', "w", encoding="utf8") as f:
+    #     json.dump(data_EST[:8001],f,ensure_ascii=False)
+    # with open('./test_data/EST_npy/MY_EST_val.json', "w", encoding="utf8") as f:
+    #     json.dump(data_EST[8001:],f,ensure_ascii=False)
     #保存为npy文件
-    np.save('./test_data/EST_npy/MY_EST_train.npy',data_EST[:8001])
-    np.save('./test_data/EST_npy/MY_EST_val.npy', data_EST[8001:])
+    # np.save('./test_data/EST_npy/MY_EST_train.npy',data_EST[:8001])
+    np.save('./test_data/EST_npy/MY_EST_val.npy', data_EST[8001:])   #要修改setname  为val
+    print(data_EST[39],len(data_EST),len(name_list))
 
 
-    print(data_EST[:3],len(data_EST),len(name_list))
 
 
 
-#json 文件转npy
+
+
 
 
 

@@ -1,7 +1,7 @@
 import numpy
 import lmdb
 import pickle
-#训练集的
+#训练集的9515
 data={}
 feature_dict0=numpy.load("../百度文字识别/MY_EST_CH_train_ocr_feature.npy",allow_pickle=True)
 feature_dict1=numpy.load("../百度文字识别/MY_EST_CH_train_ocr_feature1.npy",allow_pickle=True)
@@ -20,7 +20,7 @@ feature_dict0.item().update(feature_dict6.item())
 feature_dict0.item()
 print(feature_dict0.item()["000000.jpg"])
 print(len(feature_dict0.item().keys()))
-env_db = lmdb.Environment('../test_data/MY_EST_CH_train_ocr_feature.lmdb',map_size=3089934592)
+env_db = lmdb.Environment('../test_data/MY_EST_CH_train_ocr_feature.lmdb',map_size=2089934592)
 txn = env_db.begin(write=True)
 key_list=[]
 for i in feature_dict0.item().keys():
@@ -29,7 +29,7 @@ for i in feature_dict0.item().keys():
     value = {"image_id": name, "features": value}
     key_list.append(name.encode())
     txn.put(key = name.encode(), value = pickle.dumps(value))
-print(key_list[:10])
+print(key_list[:10],len(key_list))
 txn.put(key = b"keys", value = pickle.dumps(key_list))
-txn.commit()
+# txn.commit()
 env_db.close()
